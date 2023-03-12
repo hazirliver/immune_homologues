@@ -123,11 +123,11 @@ def get_unique_internal_nodes(paths_list: List[List[str]]) -> List[str]:
     It takes a list of paths, and returns a list of the unique internal nodes in those paths
 
     :param paths_list: a list of lists of strings, where each string is a node name
-    :type paths_list: List[List[str]]
+    :type paths_list: List[List[str]]`
     :return: a list of strings, where each string is a unique internal node name
     """
     internal_nodes_list = []
-    internal_nodes_list = [internal_nodes_list.extend(path[1:-1]) for path in paths_list]
+    [internal_nodes_list.extend(path[1:-1]) for path in paths_list]
 
     unique_internal_nodes = list(set(internal_nodes_list))
     logger.info(f'There are {len(unique_internal_nodes)} unique internal nodes')
