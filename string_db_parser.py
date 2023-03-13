@@ -60,8 +60,8 @@ def parse_args() -> Tuple[Path, str, str]:
 
 
 def make_graph(df: pd.DataFrame,
-               left_node_colname: str = '#node1',
-               right_node_colname: str = 'node2') -> Graph:
+               left_node_colname: str = 'preferredName_A',
+               right_node_colname: str = 'preferredName_B') -> Graph:
     """
     It takes a dataframe with two columns, one for the left node and one for the right node, and returns a graph
 
