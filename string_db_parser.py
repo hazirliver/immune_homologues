@@ -1,4 +1,5 @@
 import argparse
+import os
 import pickle
 from pathlib import Path
 from typing import List, Tuple
@@ -35,11 +36,14 @@ def parse_args() -> Tuple[Path, str, str]:
     args = parser.parse_args()
     filepath = args.filepath
 
-    filename = str(filepath).split('/')[-1]  # extract the filename from the filepath
-    logger.info(f'File {filename} was successfully read from path {str(filepath)}')
-
     if not filepath.is_file():
         raise FileNotFoundError(f'File not found: {str(filepath)}')
+
+    if os.path.getsize(filepath) == 0:
+        raise ValueError(f'File is empty: {str(filepath)}')
+
+    filename = str(filepath).split('/')[-1]  # extract the filename from the filepath
+    logger.info(f'File {filename} was successfully read from path {str(filepath)}')
 
     if '_' not in filename:
         raise ValueError(f'Invalid filename format: {filename}. Must contain an underscore.')
