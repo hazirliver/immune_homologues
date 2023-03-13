@@ -114,10 +114,10 @@ def get_paths(graph: Graph,
     if nx.has_path(graph, source=source_node, target=target_node):
         logger.info(f'There some path(s) between {source_node} and {target_node}. \n'
                     f'Start searching for all paths shorter than {node_dist_threshold}...')
-        selected_paths = nx.all_simple_paths(graph,
+        selected_paths = list(nx.all_simple_paths(graph,
                                              source=source_node,
                                              target=target_node,
-                                             cutoff=node_dist_threshold)
+                                             cutoff=node_dist_threshold))
     else:
         logger.error(f'There are no paths between {source_node} and {target_node}. Stop running.')
         sys.exit(1)
