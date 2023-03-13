@@ -1,6 +1,7 @@
 import argparse
 import os
 import pickle
+import sys
 from pathlib import Path
 from typing import List, Tuple
 
@@ -106,17 +107,21 @@ def get_paths(graph: Graph,
     elif not 2 < node_dist_threshold < 10:
         raise ValueError("node_dist_threshold must be in the range 2 < node_dist_threshold < 10")
 
-    # node_dist_threshold=5 => total length of path = 6 (4 internal nodes + source and target nodes)
     logger.info(f'All paths in the graph between {source_node} and {target_node} '
                 f'whose length does not exceed {node_dist_threshold} will be found.')
-    path_list_len = node_dist_threshold + 1
 
-    logger.info('Start searching for all paths...')
-    all_paths_generator = nx.all_simple_paths(graph,
-                                              source=source_node,
-                                              target=target_node)
+    logger.info('Checking existence at least one path...')
+    if nx.has_path(graph, source=source_node, target=target_node):
+        logger.info(f'There some path(s) between {source_node} and {target_node}. \n'
+                    f'Start searching for all paths shorter than {node_dist_threshold}...')
+        selected_paths = nx.all_simple_paths(graph,
+                                             source=source_node,
+                                             target=target_node,
+                                             cutoff=node_dist_threshold)
+    else:
+        logger.error(f'There are no paths between {source_node} and {target_node}. Stop running.')
+        sys.exit(1)
 
-    selected_paths = [path_list for path_list in all_paths_generator if len(path_list) <= path_list_len]
     logger.info(f'All paths were successfully found. Total: {len(selected_paths)} paths')
 
     return selected_paths
