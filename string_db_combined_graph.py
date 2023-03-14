@@ -105,6 +105,9 @@ def filter_by_distance(graph: nx.Graph,
 
     logger.info(f'Combined graph successfully filtered with minimal distance treshold={min_dist_treshold}. '
                 f'Total number of nodes in filtered graph is {len(filtered_graph.nodes)}')
+
+    logger.info(f'Filtered graph is connected: {nx.is_connected(filtered_graph)}')
+
     return filtered_graph
 
 
