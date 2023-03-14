@@ -8,6 +8,7 @@ from typing import List, Tuple
 from functools import reduce
 import networkx as nx
 from loguru import logger
+from matplotlib import pyplot as plt
 from networkx.classes.graph import Graph
 
 
@@ -133,6 +134,15 @@ def store_filtered_graph(filtered_graph: Graph) -> None:
     with open(graph_obj_file_path, 'wb') as f:
         pickle.dump(filtered_graph, f)
     logger.info(f'Filtered graph object successfully stored as pickle at {str(graph_obj_file_path)}')
+
+    # Save graph as svg figure
+    graph_figure_file_names = 'filtered_graph.svg'
+    graph_figure_file_path = string_db_base_path.joinpath(graph_figure_file_names)
+
+    plt.figure(figsize=(10, 10))
+    nx.draw(filtered_graph, with_labels=True)
+    plt.savefig(graph_figure_file_path, bbox_inches='tight')
+    logger.info(f'Filtered graph successfully saved as svg figure at {str(graph_figure_file_path)}')
 
 
 def main() -> None:
