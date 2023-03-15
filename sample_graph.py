@@ -42,7 +42,7 @@ def store_random_graph(graph: nx.Graph) -> None:
     logger.info(f'Random graph object successfully stored as pickle at {str(graph_obj_file_path)}')
 
     # Save graph as svg figure
-    graph_figure_file_names = 'filtered_graph.svg'
+    graph_figure_file_names = 'random_graph.svg'
     graph_figure_file_path = string_db_base_path.joinpath(graph_figure_file_names)
 
     plt.figure(figsize=(10, 10))
