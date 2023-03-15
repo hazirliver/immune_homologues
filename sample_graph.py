@@ -34,7 +34,7 @@ def create_random_graph(fixed_node_name, N=20, k1=1, k2=5) -> nx.Graph:
 def store_random_graph(graph: nx.Graph) -> None:
     # Store graph object
     string_db_base_path = Path('./Temporary_files/string_db/')
-    graph_obj_file_name = 'filtered_graph.pickle'
+    graph_obj_file_name = 'random_graph.pickle'
     graph_obj_file_path = string_db_base_path.joinpath(graph_obj_file_name)
 
     with open(graph_obj_file_path, 'wb') as f:

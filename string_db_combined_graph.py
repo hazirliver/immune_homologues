@@ -133,7 +133,7 @@ def read_proteins_file(protein_filepath: Path) -> List[str]:
 def store_filtered_graph(filtered_graph: Graph) -> None:
     # Store graph object
     string_db_base_path = Path('./Temporary_files/string_db/')
-    graph_obj_file_name = 'random_graph.pickle'
+    graph_obj_file_name = 'filtered_graph.pickle'
     graph_obj_file_path = string_db_base_path.joinpath(graph_obj_file_name)
 
     with open(graph_obj_file_path, 'wb') as f:
