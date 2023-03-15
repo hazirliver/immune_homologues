@@ -17,6 +17,7 @@ def create_random_graph(fixed_node_name, N=20, k1=1, k2=5) -> nx.Graph:
     G.add_node(fixed_node_name, pos=(0, 0))
 
     # Generate N random nodes with random names from the English alphabet
+    prev_node = fixed_node_name
     for _ in range(N):
         node_name = ''.join(np.random.choice(list(string.ascii_lowercase), size=5))
         angle = np.random.uniform(0, 2 * np.pi)
@@ -26,7 +27,9 @@ def create_random_graph(fixed_node_name, N=20, k1=1, k2=5) -> nx.Graph:
         y = radius * np.sin(angle)
 
         G.add_node(node_name, pos=(x, y))
-        G.add_edge(fixed_node_name, node_name)
+        G.add_edge(prev_node, node_name)
+
+        prev_node = node_name
 
     return G
 
