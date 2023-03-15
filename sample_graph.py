@@ -34,7 +34,7 @@ def create_random_graph(fixed_node_name, N=20, k1=1, k2=5) -> nx.Graph:
     return G
 
 
-def store_random_graph(graph: nx.Graph) -> None:
+def store_random_graph(graph: nx.Graph, layout_type: str) -> None:
     # Store graph object
     string_db_base_path = Path('./Temporary_files/string_db/')
     graph_obj_file_name = 'random_graph.pickle'
@@ -49,10 +49,24 @@ def store_random_graph(graph: nx.Graph) -> None:
     graph_figure_file_path = string_db_base_path.joinpath(graph_figure_file_names)
 
     plt.figure(figsize=(10, 10))
-    nx.draw(graph, with_labels=True)
-    plt.savefig(graph_figure_file_path, bbox_inches='tight')
-    logger.info(f'Random graph successfully saved as svg figure at {str(graph_figure_file_path)}')
 
+    # Apply the layout type to the graph
+    if layout_type == 'spring':
+        pos = nx.spring_layout(graph)
+    elif layout_type == 'circular':
+        pos = nx.circular_layout(graph)
+    elif layout_type == 'random':
+        pos = nx.random_layout(graph)
+    elif layout_type == 'shell':
+        pos = nx.shell_layout(graph)
+    elif layout_type == 'kamada_kawai':
+        pos = nx.kamada_kawai_layout(graph)
+    else:
+        raise ValueError(f"Invalid layout type: {layout_type}")
+
+    nx.draw(graph, pos, with_labels=True)
+    plt.savefig(graph_figure_file_path, bbox_inches='tight')
+    print(f'Random graph successfully saved as svg figure at {str(graph_figure_file_path)}')
 
 if __name__ == '__main__':
     ptx4 = create_random_graph('PTX4')
