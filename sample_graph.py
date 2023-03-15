@@ -53,4 +53,4 @@ def store_random_graph(graph: nx.Graph) -> None:
 
 if __name__ == '__main__':
     ptx4 = create_random_graph('PTX4')
-    print(list(ptx4.nodes))
+    store_random_graph(ptx4)
