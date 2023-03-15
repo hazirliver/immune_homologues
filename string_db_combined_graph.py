@@ -57,19 +57,21 @@ def load_graphs_from_folder(folder_path: Path) -> List[Graph]:
     return graphs
 
 
-def combine_graphs(graphs_list: List[Graph]) -> Graph:
-    """
-    Combine multiple networkx graphs into a single graph.
+def combine_graphs(graph_list: List[nx.Graph]) -> nx.Graph:
+    combined_graph = nx.Graph()
 
-    :param graphs_list: A list of networkx graphs to be combined
-    :type graphs_list: List[Graph]
-    :return: A single networkx graph resulting from the combination of all graphs in the input list.
-    """
-    combined_graph = reduce(nx.compose, graphs_list)
-    logger.info(f'Successfully combined {len(graphs_list)} graphs into one. '
-                f'Total number of nodes is {len(combined_graph.nodes)}')
+    for graph in graph_list:
+        for node in graph.nodes():
+            if node not in combined_graph:
+                combined_graph.add_node(node, **graph.nodes[node])
+
+        for edge in graph.edges():
+            src, dest = edge
+            if not combined_graph.has_edge(src, dest):
+                combined_graph.add_edge(src, dest, **graph.edges[src, dest])
+
+    print(list(combined_graph.nodes)[:10])
     return combined_graph
-
 
 def filter_by_distance(graph: nx.Graph,
                        initial_proteins: List[str],
