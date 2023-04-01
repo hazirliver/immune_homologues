@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 
-from functools import reduce
 import networkx as nx
 from loguru import logger
 from matplotlib import pyplot as plt
@@ -59,23 +58,22 @@ def load_graphs_from_folder(folder_path: Path) -> List[Graph]:
 
 def combine_graphs(graph_list: List[nx.Graph]) -> nx.Graph:
     combined_graph = nx.Graph()
-
+    total_number_of_nodes = {node for graph in graph_list for node in graph.nodes}
     for graph in graph_list:
         for node in graph.nodes():
             if node not in combined_graph:
-                combined_graph.add_node(node, **graph.nodes[node])
+                combined_graph.add_node(node)
 
         for edge in graph.edges():
             src, dest = edge
             if not combined_graph.has_edge(src, dest):
                 combined_graph.add_edge(src, dest, **graph.edges[src, dest])
 
-    print(list(combined_graph.nodes)[:10])
     return combined_graph
 
 def filter_by_distance(graph: nx.Graph,
                        initial_proteins: List[str],
-                       min_dist_treshold: int = 2) -> nx.Graph:
+                       min_dist_treshold: int = 1) -> nx.Graph:
     """
     It removes all vertices that are more than N steps away from all special vertices
 
@@ -104,7 +102,6 @@ def filter_by_distance(graph: nx.Graph,
 
     filtered_graph = graph.copy()
     filtered_graph.remove_nodes_from(vertices_to_remove)
-
     logger.info(f'Combined graph successfully filtered with minimal distance treshold={min_dist_treshold}. '
                 f'Total number of nodes in filtered graph is {len(filtered_graph.nodes)}')
 
@@ -130,11 +127,15 @@ def read_proteins_file(protein_filepath: Path) -> List[str]:
         return protein_list
 
 
-def store_filtered_graph(filtered_graph: Graph) -> None:
+def store_filtered_graph(filtered_graph: Graph,
+                         initial_proteins_list: List[str]) -> None:
     # Store graph object
-    string_db_base_path = Path('./Temporary_files/string_db/')
+    string_db_base_path = Path('./Temporary_files/string_db/filtred_graph')
     graph_obj_file_name = 'filtered_graph.pickle'
     graph_obj_file_path = string_db_base_path.joinpath(graph_obj_file_name)
+
+    if not string_db_base_path.exists():
+        os.makedirs(string_db_base_path)
 
     with open(graph_obj_file_path, 'wb') as f:
         pickle.dump(filtered_graph, f)
@@ -144,8 +145,14 @@ def store_filtered_graph(filtered_graph: Graph) -> None:
     graph_figure_file_names = 'filtered_graph.svg'
     graph_figure_file_path = string_db_base_path.joinpath(graph_figure_file_names)
 
-    plt.figure(figsize=(10, 10))
-    nx.draw(filtered_graph, with_labels=True)
+    plt.figure(figsize=(30, 30))
+    node_colors = [
+        'red' if node in initial_proteins_list else 'skyblue'
+        for node in filtered_graph.nodes()
+    ]
+    nx.draw(filtered_graph, with_labels=True, node_color=node_colors, pos=nx.spring_layout(filtered_graph,
+                                                                                           k=1/10))
+
     plt.savefig(graph_figure_file_path, bbox_inches='tight')
     logger.info(f'Filtered graph successfully saved as svg figure at {str(graph_figure_file_path)}')
 
@@ -156,8 +163,8 @@ def main() -> None:
     initial_proteins_list = read_proteins_file(initial_proteins_path)
 
     combined_graph = combine_graphs(graphs_list)
-    filtered_graph = filter_by_distance(combined_graph, initial_proteins_list)
-    store_filtered_graph(filtered_graph)
+    filtered_graph = filter_by_distance(combined_graph, initial_proteins_list, min_dist_treshold=1)
+    store_filtered_graph(filtered_graph, initial_proteins_list)
 
 if __name__ == '__main__':
     main()

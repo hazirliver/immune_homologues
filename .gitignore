@@ -5,11 +5,11 @@
 # User-specific stuff
 .idea/*
 
-./Temporary_files/
-./Database/
-./IH_venv/
-./Input_data/
-./taxdump/
+Temporary_files/
+Database/
+IH_venv/
+Input_data/
+taxdump/
 
 # CMake
 cmake-build-*/

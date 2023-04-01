@@ -5,7 +5,7 @@ from itertools import combinations
 from pathlib import Path
 from random import uniform
 from time import sleep
-from typing import Tuple, List, TypeAlias
+from typing import Tuple, List, Union
 from io import StringIO
 
 import pandas as pd
@@ -18,11 +18,9 @@ STRING_PARAMS = {
     'species': 9606,
     'required_score': 400,
     'network_type': 'functional',
-    'add_nodes': 50,
+    'add_nodes': 100,
     'show_query_node_labels': 1,
 }
-
-ProteinCombinations: TypeAlias = List[Tuple[str, ...]]
 
 
 def parse_args() -> Path:
@@ -69,7 +67,7 @@ def read_proteins_file(protein_filepath: Path) -> List[str]:
 
 
 def get_all_N_combinations(filepath: Path,
-                           N: int = 2) -> ProteinCombinations:
+                           N: int = 2) -> List[Tuple[str, ...]]:
     """
     It reads the protein names from the file, and then returns all possible unique combinations of N proteins
 
@@ -112,7 +110,6 @@ def process_one_combination_string_db(protein_combination: Tuple[str, ...]) -> N
     output_format = 'tsv'
     method = 'network'
     request_url = '/'.join([STRING_API_URL, output_format, method])
-
     params = {**STRING_PARAMS, "identifiers": "%0d".join(protein_combination)}
 
     try:
@@ -120,7 +117,6 @@ def process_one_combination_string_db(protein_combination: Tuple[str, ...]) -> N
 
         response = requests.post(request_url, data=params)
 
-        response.raise_for_status()  # raise an exception for 4xx or 5xx status codes
         logger.info(f"Successfully received a response from the String-DB "
                     f"for proteins [{', '.join(protein_combination)}]")
     except requests.exceptions.RequestException as e:
@@ -128,12 +124,12 @@ def process_one_combination_string_db(protein_combination: Tuple[str, ...]) -> N
         logger.error(f"Error making request for [{', '.join(protein_combination)}]: {e}")
         sys.exit(1)
 
-    paroteins_filepath = Path(f"./Temporary_files/string_db/{'_'.join(protein_combination)}.tsv")
-    write_response_tsv(response, paroteins_filepath)
-    logger.info(f"String-DB results for [{', '.join(protein_combination)}] saved to {str(paroteins_filepath)}")
+    proteins_filepath = Path(f"./Temporary_files/string_db/{'_'.join(protein_combination)}.tsv")
+    write_response_tsv(response, proteins_filepath)
+    logger.info(f"String-DB results for [{', '.join(protein_combination)}] saved to {str(proteins_filepath)}")
 
 
-def fetch_all_string_db(protein_combinations: ProteinCombinations) -> None:
+def fetch_all_string_db(protein_combinations: Union[List[Tuple[str, ...]], List[str]]) -> None:
     """
     For each protein combination, fetch the interactions from STRING-DB and save them to a file
 
@@ -147,10 +143,40 @@ def fetch_all_string_db(protein_combinations: ProteinCombinations) -> None:
         logger.info(f"[{id_}/{number_of_combinations}]. Successfully processed")
 
 
+def process_one_protein_string_db(protein):
+    output_format = 'tsv'
+    method = 'network'
+    request_url = '/'.join([STRING_API_URL, output_format, method])
+    params = {**STRING_PARAMS, "identifiers": protein}
+
+    try:
+        sleep(uniform(0.5, 5))
+
+        response = requests.post(request_url, data=params)
+
+        logger.info(f"Successfully received a response from the String-DB "
+                    f"for protein {protein}")
+    except requests.exceptions.RequestException as e:
+        # Catch any request exceptions and handle them appropriately
+        logger.error(f"Error making request for {protein}: {e}")
+        sys.exit(1)
+
+    proteins_filepath = Path(f"./Temporary_files/string_db/{protein}.tsv")
+    write_response_tsv(response, proteins_filepath)
+    logger.info(f"String-DB results for {protein} saved to {str(proteins_filepath)}")
+def fetch_one_string_db(protein_list: List[str]) -> None:
+    number_of_proteins = len(protein_list)
+    for id_, protein in enumerate(protein_list, start=1):
+        logger.info(f"[{id_}/{number_of_proteins}]. Start processing {protein}")
+        process_one_protein_string_db(protein)
+        logger.info(f"[{id_}/{number_of_proteins}]. Successfully processed")
+
+
 def main():
     logger.info('Start fetching String-DB')
     protein_of_interest_filepath = parse_args()
     protein_combinations = get_all_N_combinations(protein_of_interest_filepath, N=2)
+    fetch_one_string_db(read_proteins_file(protein_of_interest_filepath))
     fetch_all_string_db(protein_combinations)
     logger.info('All results successfully fetched.')
 

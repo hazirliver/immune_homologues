@@ -4,14 +4,14 @@ description = 'Script for mapping BG patient IDs to Immune Blood clusters'
 authors = [
     { name = 'Arseniy Sokolov', email = 'arseniy.sokolov@bostongene.com' },
 ]
-requires-python = '>=3.9'
+requires-python = '>=3.10'
 requrements = { file = 'requrements.txt' }
 
 
 [tool.ruff]
 line-length = 120
 update-check = false
-target-version = "py39"
+target-version = "py310"
 
 select = [
     # pyflakes
