@@ -1,0 +1,73 @@
+[project]
+name = 'Immune Portrait Clusters mapping'
+description = 'Script for mapping BG patient IDs to Immune Blood clusters'
+authors = [
+    { name = 'Arseniy Sokolov', email = 'arseniy.sokolov@bostongene.com' },
+]
+requires-python = '>=3.10'
+requrements = { file = 'requrements.txt' }
+
+
+[tool.ruff]
+line-length = 120
+update-check = false
+target-version = "py310"
+
+select = [
+    # pyflakes
+    "F",
+    # pycodestyle
+    "E",
+    "W",
+    # flake8-2020
+    "YTT",
+    # flake8-bugbear
+    "B",
+    # pylint
+    "PLE", "PLW",
+    # misc lints
+    "PIE",
+    # tidy imports
+    "TID",
+    # implicit string concatenation
+    "ISC",
+]
+
+ignore = [
+    # space before : (needed for how black formats slicing)
+    # "E203",  # not yet implemented
+    # module level import not at top of file
+    "E402",
+    # do not assign a lambda expression, use a def
+    "E731",
+    # line break before binary operator
+    # "W503",  # not yet implemented
+    # line break after binary operator
+    # "W504",  # not yet implemented
+    # controversial
+    "B006",
+    # controversial
+    "B007",
+    # controversial
+    "B008",
+    # setattr is used to side-step mypy
+    "B009",
+    # getattr is used to side-step mypy
+    "B010",
+    # tests use assert False
+    "B011",
+    # tests use comparisons but not their returned value
+    "B015",
+    # false positives
+    "B019",
+    # Loop control variable overrides iterable it iterates
+    "B020",
+    # Function definition does not bind loop variable
+    "B023",
+    # Functions defined inside a loop must not use variables redefined in the loop
+    # "B301",  # not yet implemented
+
+    # Additional checks that don't pass yet
+    # Within an except clause, raise exceptions with ...
+    "B904",
+]
